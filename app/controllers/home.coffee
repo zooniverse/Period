@@ -2,8 +2,9 @@ Chart = require '../lib/chart'
 VariableSlider = require '../lib/variable_slider'
 
 class Home
-  constructor: (opts = { }) ->
-    @primaryChart = new Chart $.extend true, { }, opts, name: 'primary-chart'
+  constructor: ->
+    @overviewChart = new Chart width: 400, height: 250, name: 'overview'
+    @primaryChart = new Chart name: 'primary'
     
     @periodSlider = new VariableSlider name: 'period', label: 'Period', callback: (value) =>
       @primaryChart.period = value

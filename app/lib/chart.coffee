@@ -7,9 +7,12 @@ class Chart
     @height = @opts.height - @margin.top - @margin.bottom
     @period = null
     
-    @svg = d3.select("#app .#{ @opts.name }").append('svg')
-      .attr('width', @width + @margin.left + @margin.right)
-      .attr('height', @height + @margin.top + @margin.bottom)
+    @svg = d3.select(".charts")
+      .append('div')
+        .attr('class', "#{ @opts.name } chart")
+      .append('svg')
+        .attr('width', @width + @margin.left + @margin.right)
+        .attr('height', @height + @margin.top + @margin.bottom)
     
     @svg.append('g')
       .attr('class', 'y axis')
@@ -32,6 +35,7 @@ class Chart
       { x: +d.x - @minX, y: +d.y }
     , (e, rows) =>
       @rawData = rows
+      @totalAvg = d3.median @rawData, (d) -> d.y
       @smooth()
       @render()
   
@@ -46,7 +50,6 @@ class Chart
   
   smooth: =>
     if @smoothing
-      totalAvg = d3.median @rawData, (d) -> d.y
       @data = []
       
       for d in @rawData
@@ -62,7 +65,7 @@ class Chart
         avg = sum / count
         @data.push
           x: d.x
-          y: totalAvg * d.y / avg
+          y: @totalAvg * d.y / avg
     else
       @data = $.extend true, [], @rawData
   

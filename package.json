@@ -1,5 +1,5 @@
 {
-  "name": "solar",
+  "name": "period",
   "version": "0.0.1",
   "dependencies": {
     "haw": "~0.0.7",
