@@ -121,7 +121,8 @@ class Gpu
     @gl.activeTexture(@gl.TEXTURE1)
     location = @gl.getUniformLocation(@program, "uY")
     @gl.uniform1i(location, 1)
-  
+    @gldrawArrays(ctx.TRIANGLES, 0, 6)
+    
   setTexture: (index, arr) ->
     
     @gl.activeTexture(@gl["TEXTURE#{index}"])
