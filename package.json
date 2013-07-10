@@ -1,0 +1,9 @@
+{
+  "name": "solar",
+  "version": "0.0.1",
+  "dependencies": {
+    "haw": "~0.0.7",
+    "jqueryify": "~1.9.1",
+    "d3": "3.2.4"
+  }
+}
