@@ -1,3 +1,7 @@
+
+Gpu = require '../lib/gpu'
+
+
 class Chart
   constructor: (opts) ->
     @opts = $.extend true, { }, { name: 'chart', width: 800, height: 500, margin: { top: 20, right: 20, bottom: 30, left: 60 } }, opts
@@ -26,7 +30,9 @@ class Chart
       .attr('class', 'dots')
       .attr('transform', "translate(#{ @margin.left }, #{ @margin.right })")
     
+    @gpu = new Gpu()
     @loadData()
+  
   
   loadData: =>
     d3.csv 'lcs_0.txt', (d, i) ->
@@ -35,6 +41,13 @@ class Chart
       { x: +d.x - @minX, y: +d.y }
     , (e, rows) =>
       @rawData = rows
+      
+      # Create two arrays (x and y)
+      
+      xArr = new Float32Array( @rawData.map( (d) -> return d.x ) )
+      yArr = new Float32Array( @rawData.map( (d) -> return d.y ) )
+      @gpu.loadData(xArr, yArr)
+      
       @totalAvg = d3.median @rawData, (d) -> d.y
       @smooth()
       @render()
