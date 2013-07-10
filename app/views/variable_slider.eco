@@ -1,6 +1,6 @@
 <div class="variable-slider">
   <label class="slider-label" data-variable="<%= @name %>" for="<%= @name %>"><%= @label %></label>
   <input class="slider-value" name="<%= @name %>" data-variable="<%= @name %>" type="number" value="<%= @value %>" step="any">
-  <input class="slider" data-variable="<%= @name %>" type="range" name="<%= @name %>" value="<%= @value %>" min="<%= @min or 1 %>" max="<%= @max or 45 %>" step="<%= @step or 0.01 %>">
+  <input class="slider" data-variable="<%= @name %>" type="range" name="<%= @name %>" value="<%= @value %>" min="<%= @min %>" max="<%= @max %>" step="<%= @step %>">
   <input class="slider-reset" data-variable="<%= @name %>" name="<%= @name %>" type="button" name="reset" value="Reset">
 </div>
