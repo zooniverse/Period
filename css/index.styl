@@ -1,13 +1,28 @@
-@import 'jquery-ui-1.10.3.custom.css'
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button
+  -webkit-appearance: none
+  margin: 0
 
 #app
   margin: 10px 50px
   
-  .slider-label
-    display: inline-block
-    width: 40px
-    text-align: center
+  .variable-sliders
+    display: table
+    width: 100%
     
-  .slider
-    display: inline-block
-    width: 800px
+    .variable-slider
+      display: table-row
+      
+      .slider-label, .slider-value, .slider
+        display: table-cell
+        margin: 5px 20px
+        vertical-align: middle
+      
+      .slider-label
+        text-align: right
+      
+      .slider-value
+        max-width: 40px
+        text-align: center
+      
+      .slider
+        min-width: 500px
