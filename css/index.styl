@@ -2,6 +2,9 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button
   -webkit-appearance: none
   margin: 0
 
+svg
+  shape-rendering: crispEdges
+
 #app
   margin: 10px 50px
   
@@ -32,3 +35,14 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button
     
     .chart
       float: left
+      
+      .overlay
+        fill: none
+    
+    .primary.chart
+      .overlay
+        cursor: move
+        pointer-events: all
+      
+      .dot
+        pointer-events: none

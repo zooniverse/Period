@@ -3,8 +3,9 @@ VariableSlider = require '../lib/variable_slider'
 
 class Home
   constructor: ->
-    @overviewChart = new Chart width: 400, height: 250, name: 'overview'
-    @primaryChart = new Chart name: 'primary'
+    @primaryChart = new Chart name: 'primary', zoomable: true, callback: (chart) =>
+      @overviewChart = new Chart width: 400, height: 250, name: 'overview', parent: chart, title: 'Original'
+      @zoomChart = new Chart width: 400, height: 250, name: 'zoom', parent: chart, title: 'Zoom Context'
     
     @periodSlider = new VariableSlider name: 'period', label: 'Period', callback: (value) =>
       @primaryChart.period = value
