@@ -50,6 +50,8 @@ class Chart
       .attr('height', @height)
       # .attr('clip-path', 'url(#clip)')
     
+    @colors = d3.scale.category10()
+    
     if @parent
       @rawData = @parent.rawData
       @data = @parent.data
@@ -133,6 +135,11 @@ class Chart
     chartRegion.attr('class', 'dot')
       .attr('cx', @x)
       .attr('cy', @y)
+      .style 'fill', (d, i) =>
+        if @period and @colorize
+          @colors Math.floor(d.x / @period)
+        else
+          'black'
   
   render: =>
     xExtent = d3.extent @data, (d) -> d.x
