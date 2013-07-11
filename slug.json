@@ -1,3 +1,4 @@
 {
-  "port": 9295
+  "port": 9295,
+  "libs": ["./app/lib/sylvester.js"]
 }

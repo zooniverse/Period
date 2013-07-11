@@ -15,7 +15,7 @@ class Chart
     @brushing = false
     @period = null
     
-    @svg = d3.select(".charts")
+    @svg = d3.select('.charts')
       .append('div')
         .attr('class', "#{ @opts.name } chart")
       .append('svg')
@@ -44,11 +44,16 @@ class Chart
       .attr('transform', "translate(#{ @margin.left }, #{ @height + @margin.top })")
     
     @svg.append('g')
-      .attr('class', 'chart-region')
-      .attr('transform', "translate(#{ @margin.left }, #{ @margin.top })")
-      .attr('width', @width)
-      .attr('height', @height)
-      # .attr('clip-path', 'url(#clip)')
+        .attr('class', 'chart-region')
+        .attr('transform', "translate(#{ @margin.left }, #{ @margin.top })")
+        .attr('width', @width)
+        .attr('height', @height)
+      .append('path')
+        .attr('class', 'fit-line')
+        .attr('stroke-width', 3.0)
+        .attr('stroke', '#049cdb')
+        .attr('fill', 'transparent')
+        .attr('opacity', 1.0)
     
     @colorize = false
     @colors = d3.scale.category20()
@@ -91,6 +96,34 @@ class Chart
   y: (d) =>
     @yScale(d.y)
   
+  dataInView: =>
+    inView = []
+    [min, max] = @xScale.domain()
+    for datum in @data
+      if @period
+        d = x: datum.x % @period, y: datum.y
+        
+        if d.x >= min and d.x <= max
+          inView.push d
+      else
+        return inView if datum.x > max
+        if datum.x >= min and datum.x <= max
+          inView.push datum
+    
+    inView.sort (a, b) -> if a.x < b.x then -1 else 1
+  
+  drawFit: =>
+    data = @dataInView()
+    console.log data
+    fit = Gauss.fit data
+    [min, max] = @xScale.domain()
+    @fitData = []
+    for point in data
+      @fitData.push x: point.x, y: Gauss.model(fit, point.x - min)[0]
+    
+    fitLine = d3.svg.line().x(@x).y @y
+    @svg.select('.fit-line').attr 'd', fitLine(@fitData)
+  
   smooth: =>
     if @smoothing
       @data = []
@@ -102,9 +135,7 @@ class Chart
         count = 0
         
         for p in @rawData
-          if p.x > max
-            break
-          
+          break if p.x > max
           if p.x >= min and p.x <= max
             sum += p.y
             count++
