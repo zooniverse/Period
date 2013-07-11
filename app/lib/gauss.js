@@ -49,6 +49,7 @@ var fit = function (data) {
             val = data[i].y - model(p, data[i].x)[0];
             chi.push(val);
         }
+        
         return chi;
     };
     

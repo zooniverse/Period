@@ -1,6 +1,4 @@
-
 Gpu = require '../lib/gpu'
-
 
 class Chart
   constructor: (opts) ->
@@ -64,7 +62,7 @@ class Chart
       @render()
       @callback? @
     else
-      @gpu = new Gpu()
+      # @gpu = new Gpu()
       @loadData()
   
   
@@ -78,9 +76,9 @@ class Chart
       
       # Create two arrays (x and y)
       
-      xArr = new Float32Array( @rawData.map( (d) -> return d.x ) )
-      yArr = new Float32Array( @rawData.map( (d) -> return d.y ) )
-      @gpu.loadData(xArr, yArr)
+      # xArr = new Float32Array( @rawData.map( (d) -> return d.x ) )
+      # yArr = new Float32Array( @rawData.map( (d) -> return d.y ) )
+      # @gpu.loadData(xArr, yArr)
       
       @totalAvg = d3.median @rawData, (d) -> d.y
       @smooth()
@@ -114,7 +112,6 @@ class Chart
   
   drawFit: =>
     data = @dataInView()
-    console.log data
     fit = Gauss.fit data
     [min, max] = @xScale.domain()
     @fitData = []
