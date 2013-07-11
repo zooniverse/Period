@@ -21,13 +21,10 @@ class Chart
         .attr('width', @width + @margin.left + @margin.right)
         .attr('height', @height + @margin.top + @margin.bottom)
     
-    @svg.append('defs').append('clipPath')
-        .attr('id', 'clip')
-      .append('rect')
-        .attr('width', @width)
-        .attr('height', @height)
-        .attr('x', @margin.left)
-        .attr('y', @margin.top)
+    # @svg.append('defs').append('svg:clipPath')
+    #     .attr('id', 'clip')
+    #   .append('path')
+    #     .attr('d', "M 0 0 L #{ @width } 0 L #{ @width } #{ @height } L 0 #{ @height }")
     
     if @opts.title
       @svg.append('text')
@@ -48,7 +45,9 @@ class Chart
     @svg.append('g')
       .attr('class', 'chart-region')
       .attr('transform', "translate(#{ @margin.left }, #{ @margin.top })")
-      .attr('clip', 'url(#clip)')
+      .attr('width', @width)
+      .attr('height', @height)
+      # .attr('clip-path', 'url(#clip)')
     
     if @parent
       @rawData = @parent.rawData
