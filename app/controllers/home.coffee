@@ -8,12 +8,16 @@ class Home
       @zoomChart = new Chart width: 400, height: 250, name: 'zoom', zoomable: true, parent: chart, title: 'Zoom Context'
     
     @periodSlider = new VariableSlider name: 'period', label: 'Period', callback: (value) =>
-      @primaryChart.period = value
+      @primaryChart.period = @zoomChart.period = value
+      @zoomChart.data = @primaryChart.data
       @primaryChart.render()
+      @zoomChart.render()
     
     @smoothingSlider = new VariableSlider name: 'smoothing', label: 'Smoothing Window', min: 0.1, callback: (value) =>
-      @primaryChart.smoothing = value
+      @primaryChart.smoothing = @zoomChart.smoothing = value
       @primaryChart.smooth()
+      @zoomChart.data = @primaryChart.data
       @primaryChart.render()
+      @zoomChart.render()
 
 module.exports = Home

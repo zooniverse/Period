@@ -12,6 +12,7 @@ class Chart
     @parent = @opts.parent
     @callback = @opts.callback
     
+    @brushing = false
     @period = null
     
     @svg = d3.select(".charts")
@@ -110,49 +111,17 @@ class Chart
   
   brushed: =>
     if @brush.empty()
+      @brushing = false
       xExtent = d3.extent @parent.data, (d) -> d.x
       @parent.xScale.domain xExtent
     else
+      @brushing = true
       @parent.xScale.domain @brush.extent()
-    console.log @brush.extent()
     
-    chartRegion = @parent.svg.select('.chart-region').selectAll('.dot')
-      .data(@parent.data)
-    
-    chartRegion.enter().append('circle')
-      .attr('class', 'dot')
-      .attr('r', 2.0)
-      .attr('cx', @parent.x)
-      .attr('cy', @parent.y)
-    
-    chartRegion.attr('class', 'dot')
-      .attr('cx', @parent.x)
-      .attr('cy', @parent.y)
-    
+    @parent.plot()
     @parent.svg.select('.x.axis').call d3.svg.axis().scale(@parent.xScale).orient('bottom')
   
-  render: =>
-    xExtent = d3.extent @data, (d) -> d.x
-    yExtent = d3.extent @data, (d) -> d.y
-    xExtent[1] = @period if @period
-    
-    @xScale = d3.scale.linear().range([0, @width]).domain xExtent
-    @yScale = d3.scale.linear().range([@height, 0]).domain yExtent
-    
-    if @opts.zoomable and @parent
-      @brush = d3.svg.brush()
-        .x(@.xScale)
-        .on 'brush', @brushed
-      
-      @svg.select('.chart-region')
-        .call(@brush)
-        .selectAll('rect')
-          .attr('y', 0)
-          .attr('height', @height)
-    
-    @svg.select('.y.axis').call d3.svg.axis().scale(@yScale).orient('left')
-    @svg.select('.x.axis').call d3.svg.axis().scale(@xScale).orient('bottom')
-    
+  plot: =>
     chartRegion = @svg.select('.chart-region').selectAll('.dot')
       .data(@data)
     
@@ -165,5 +134,34 @@ class Chart
     chartRegion.attr('class', 'dot')
       .attr('cx', @x)
       .attr('cy', @y)
+  
+  render: =>
+    xExtent = d3.extent @data, (d) -> d.x
+    xExtent[1] = @period if @period
+    yExtent = d3.extent @data, (d) -> d.y
+    
+    @xScale = d3.scale.linear().range([0, @width]).domain xExtent
+    @brush?.x @xScale
+    @yScale = d3.scale.linear().range([@height, 0]).domain yExtent
+    
+    if !@brush and @opts.zoomable and @parent
+      @brush = d3.svg.brush()
+        .x(@xScale)
+        .on 'brush', @brushed
+      
+      @svg.select('.chart-region')
+        .call(@brush)
+        .selectAll('rect')
+          .attr('y', 0)
+          .attr('height', @height)
+    
+    @svg.select('.y.axis').call d3.svg.axis().scale(@yScale).orient('left')
+    @svg.select('.x.axis').call d3.svg.axis().scale(@xScale).orient('bottom')
+    
+    if @brushing
+      @plot()
+      @brushed()
+    else
+      @plot()
 
 module.exports = Chart
