@@ -50,7 +50,8 @@ class Chart
       .attr('height', @height)
       # .attr('clip-path', 'url(#clip)')
     
-    @colors = d3.scale.category10()
+    @colorize = false
+    @colors = d3.scale.category20()
     
     if @parent
       @rawData = @parent.rawData
@@ -100,9 +101,13 @@ class Chart
         sum = 0
         count = 0
         
-        for p in @rawData when p.x >= min and p.x <= max
-          sum += p.y
-          count++
+        for p in @rawData
+          if p.x > max
+            break
+          
+          if p.x >= min and p.x <= max
+            sum += p.y
+            count++
         
         avg = sum / count
         @data.push
@@ -132,14 +137,16 @@ class Chart
       .attr('cx', @x)
       .attr('cy', @y)
     
-    chartRegion.attr('class', 'dot')
+    dot = chartRegion.attr('class', 'dot')
       .attr('cx', @x)
       .attr('cy', @y)
-      .style 'fill', (d, i) =>
-        if @period and @colorize
-          @colors Math.floor(d.x / @period)
-        else
-          'black'
+    
+    if @colorize
+      dot.style 'fill', (d, i) =>
+          if @period
+            @colors Math.floor(d.x / @period)
+          else
+            'black'
   
   render: =>
     xExtent = d3.extent @data, (d) -> d.x
