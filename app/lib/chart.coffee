@@ -112,8 +112,7 @@ class Chart
   brushed: =>
     if @brush.empty()
       @brushing = false
-      xExtent = d3.extent @parent.data, (d) -> d.x
-      @parent.xScale.domain xExtent
+      @parent.render()
     else
       @brushing = true
       @parent.xScale.domain @brush.extent()
