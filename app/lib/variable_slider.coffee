@@ -26,7 +26,6 @@ class VariableSlider
       input = $(ev.target)
       variable = input.data 'variable'
       val = input.val()
-      @chart[variable] = val
       slider = input.siblings('.slider').val val
       input.val slider.val()
       @opts.callback? val

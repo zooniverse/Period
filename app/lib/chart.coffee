@@ -9,6 +9,7 @@ class Chart
     @margin = @opts.margin
     @width = @opts.width - @margin.left - @margin.right
     @height = @opts.height - @margin.top - @margin.bottom
+    @parent = @opts.parent
     @callback = @opts.callback
     
     @period = null
@@ -20,6 +21,14 @@ class Chart
         .attr('width', @width + @margin.left + @margin.right)
         .attr('height', @height + @margin.top + @margin.bottom)
     
+    @svg.append('defs').append('clipPath')
+        .attr('id', 'clip')
+      .append('rect')
+        .attr('width', @width)
+        .attr('height', @height)
+        .attr('x', @margin.left)
+        .attr('y', @margin.top)
+    
     if @opts.title
       @svg.append('text')
         .attr('x', @margin.left + @width / 2)
@@ -27,12 +36,6 @@ class Chart
         .attr('text-anchor', 'middle')
         .style('font-size', '16px')
         .text @opts.title
-    
-    @svg.append('rect')
-      .attr('class', 'overlay')
-      .attr('width', @width)
-      .attr('height', @height)
-      .attr('transform', "translate(#{ @margin.left }, #{ @margin.top })")
     
     @svg.append('g')
       .attr('class', 'y axis')
@@ -44,11 +47,12 @@ class Chart
     
     @svg.append('g')
       .attr('class', 'chart-region')
-      .attr('transform', "translate(#{ @margin.left }, #{ @margin.right })")
+      .attr('transform', "translate(#{ @margin.left }, #{ @margin.top })")
+      .attr('clip', 'url(#clip)')
     
-    if @opts.parent
-      @rawData = @opts.parent.rawData
-      @data = @opts.parent.data
+    if @parent
+      @rawData = @parent.rawData
+      @data = @parent.data
       @render()
       @callback? @
     else
@@ -105,13 +109,28 @@ class Chart
     else
       @data = $.extend true, [], @rawData
   
-  zoom: =>
-    console.log 'zooming'
-    @svg.select('.y.axis').call d3.svg.axis().scale(@yScale).orient('left')
-    @svg.select('.x.axis').call d3.svg.axis().scale(@xScale).orient('bottom')
-    translation = "translate(#{ @margin.left + d3.event.translate[0] }, #{ @margin.right + d3.event.translate[1] })"
-    scale = "scale(#{ d3.event.scale })"
-    @svg.select('.chart-region').attr 'transform', "#{ translation }#{ scale }"
+  brushed: =>
+    if @brush.empty()
+      xExtent = d3.extent @parent.data, (d) -> d.x
+      @parent.xScale.domain xExtent
+    else
+      @parent.xScale.domain @brush.extent()
+    console.log @brush.extent()
+    
+    chartRegion = @parent.svg.select('.chart-region').selectAll('.dot')
+      .data(@parent.data)
+    
+    chartRegion.enter().append('circle')
+      .attr('class', 'dot')
+      .attr('r', 2.0)
+      .attr('cx', @parent.x)
+      .attr('cy', @parent.y)
+    
+    chartRegion.attr('class', 'dot')
+      .attr('cx', @parent.x)
+      .attr('cy', @parent.y)
+    
+    @parent.svg.select('.x.axis').call d3.svg.axis().scale(@parent.xScale).orient('bottom')
   
   render: =>
     xExtent = d3.extent @data, (d) -> d.x
@@ -121,14 +140,16 @@ class Chart
     @xScale = d3.scale.linear().range([0, @width]).domain xExtent
     @yScale = d3.scale.linear().range([@height, 0]).domain yExtent
     
-    if @opts.zoomable
-      zoomBehavior = d3.behavior.zoom()
-        .x(@xScale)
-        .y(@yScale)
-        .scaleExtent([1, 8])
-        .on 'zoom', @zoom
+    if @opts.zoomable and @parent
+      @brush = d3.svg.brush()
+        .x(@.xScale)
+        .on 'brush', @brushed
       
-      @svg.select('.overlay').call(zoomBehavior) if @opts.zoomable
+      @svg.select('.chart-region')
+        .call(@brush)
+        .selectAll('rect')
+          .attr('y', 0)
+          .attr('height', @height)
     
     @svg.select('.y.axis').call d3.svg.axis().scale(@yScale).orient('left')
     @svg.select('.x.axis').call d3.svg.axis().scale(@xScale).orient('bottom')
