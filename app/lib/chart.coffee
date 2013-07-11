@@ -2,7 +2,7 @@ Gpu = require '../lib/gpu'
 
 class Chart
   constructor: (opts) ->
-    @opts = $.extend true, { }, { name: 'chart', width: 800, height: 500, margin: { top: 20, right: 20, bottom: 30, left: 60 } }, opts
+    @opts = $.extend true, { }, { container: '.charts', name: 'chart', width: 800, height: 500, margin: { top: 20, right: 20, bottom: 30, left: 60 } }, opts
     
     @margin = @opts.margin
     @width = @opts.width - @margin.left - @margin.right
@@ -13,7 +13,7 @@ class Chart
     @brushing = false
     @period = null
     
-    @svg = d3.select('.charts')
+    @svg = d3.select(@opts.container)
       .append('div')
         .attr('class', "#{ @opts.name } chart")
       .append('svg')
@@ -63,11 +63,13 @@ class Chart
       @callback? @
     else
       # @gpu = new Gpu()
-      @loadData()
+      @loadData @opts.file
   
   
-  loadData: =>
-    d3.csv 'lcs_0.txt', (d, i) ->
+  loadData: (file) =>
+    @minX = null
+    
+    d3.csv file, (d, i) ->
       @minX or= +d.x
       
       { x: +d.x - @minX, y: +d.y }
