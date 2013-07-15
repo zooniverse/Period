@@ -94,7 +94,7 @@ class Chart
       @xScale d.x
   
   y: (d) =>
-    @yScale(d.y)
+    @yScale d.y
   
   dataInView: =>
     inView = []
@@ -161,15 +161,16 @@ class Chart
     chartRegion = @svg.select('.chart-region').selectAll('.dot')
       .data(@data)
     
-    chartRegion.enter().append('circle')
+    chartRegion.enter().append('rect')
       .attr('class', 'dot')
-      .attr('r', 2.0)
-      .attr('cx', @x)
-      .attr('cy', @y)
+      .attr('width', 2)
+      .attr('height', 2)
+      .attr('x', @x)
+      .attr('y', @y)
     
     dot = chartRegion.attr('class', 'dot')
-      .attr('cx', @x)
-      .attr('cy', @y)
+      .attr('x', @x)
+      .attr('y', @y)
     
     if @colorize
       dot.style 'fill', (d, i) =>
