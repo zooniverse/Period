@@ -17,35 +17,43 @@ class Chart
       .append('div')
         .attr('class', "#{ @opts.name } chart")
       .append('svg')
-        .attr('width', @width + @margin.left + @margin.right)
-        .attr('height', @height + @margin.top + @margin.bottom)
+        .attr('xmlns', 'http://www.w3.org/2000/svg')
+        .attr('version', '1.1')
+        .attr('viewBox', "0 0 #{ @opts.width } #{ @opts.height }")
+        .attr('width', @opts.width)
+        .attr('height', @opts.height)
+      .append('g')
+        .attr('transform', "translate(#{ @margin.left }, #{ @margin.top })")
     
-    # @svg.append('defs').append('svg:clipPath')
-    #     .attr('id', 'clip')
-    #   .append('path')
-    #     .attr('d', "M 0 0 L #{ @width } 0 L #{ @width } #{ @height } L 0 #{ @height }")
+    if @opts.name is 'primary'
+      @svg.append('defs').append('clipPath')
+          .attr('id', 'clip')
+        .append('rect')
+          .attr('transform', 'translate(0, 0)')
+          .attr('width', @width)
+          .attr('height', @height)
     
     if @opts.title
       @svg.append('text')
-        .attr('x', @margin.left + @width / 2)
-        .attr('y', @margin.top)
+        .attr('x', @width / 2)
+        .attr('y', 0)
         .attr('text-anchor', 'middle')
         .style('font-size', '16px')
         .text @opts.title
     
     @svg.append('g')
       .attr('class', 'y axis')
-      .attr('transform', "translate(#{ @margin.left }, #{ @margin.top })")
+      .attr('transform', "translate(#{ 0 }, #{ 0 })")
     
     @svg.append('g')
       .attr('class', 'x axis')
-      .attr('transform', "translate(#{ @margin.left }, #{ @height + @margin.top })")
+      .attr('transform', "translate(#{ 0 }, #{ @height })")
     
     @svg.append('g')
         .attr('class', 'chart-region')
-        .attr('transform', "translate(#{ @margin.left }, #{ @margin.top })")
         .attr('width', @width)
         .attr('height', @height)
+        .attr('clip-path', 'url(#clip)')
       .append('path')
         .attr('class', 'fit-line')
         .attr('stroke-width', 3.0)
@@ -195,7 +203,7 @@ class Chart
       
       @svg.select('.chart-region')
         .call(@brush)
-        .selectAll('rect')
+        .selectAll('rect.background,rect.extent,.resize rect')
           .attr('y', 0)
           .attr('height', @height)
     
