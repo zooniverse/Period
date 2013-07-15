@@ -30,13 +30,13 @@ class Home
       @primaryChart.render()
       @zoomChart.render()
     
-    i = 0
-    for type, list of examples
-      $('.examples').append $("<div class='example' name='#{ type }'><h2 class='type'>#{ type }</span></h2>")
-      
-      for file in list
-        new Chart file: "examples/#{ file }.csv", container: ".examples [name='#{ type }']", name: "example-#{ i += 1}", title: file, width: 320, height: 200
-      
-      
+    # i = 0
+    # for type, list of examples
+    #   $('.examples').append $("<div class='example' name='#{ type }'><h2 class='type'>#{ type }</span></h2>")
+    #   
+    #   for file in list
+    #     new Chart file: "examples/#{ file }.csv", container: ".examples [name='#{ type }']", name: "example-#{ i += 1}", title: file, width: 320, height: 200
+    #   
+    #   
 
 module.exports = Home
