@@ -25,13 +25,12 @@ class Chart
       .append('g')
         .attr('transform', "translate(#{ @margin.left }, #{ @margin.top })")
     
-    if @opts.name is 'primary'
-      @svg.append('defs').append('clipPath')
-          .attr('id', 'clip')
-        .append('rect')
-          .attr('transform', 'translate(0, 0)')
-          .attr('width', @width)
-          .attr('height', @height)
+    @svg.append('defs').append('clipPath')
+        .attr('id', "clip-#{ @opts.name }")
+      .append('rect')
+        .attr('transform', 'translate(0, 0)')
+        .attr('width', @width)
+        .attr('height', @height)
     
     if @opts.title
       @svg.append('text')
@@ -53,7 +52,7 @@ class Chart
         .attr('class', 'chart-region')
         .attr('width', @width)
         .attr('height', @height)
-        .attr('clip-path', 'url(#clip)')
+        .attr('clip-path', "url(#clip-#{ @opts.name })")
       .append('path')
         .attr('class', 'fit-line')
         .attr('stroke-width', 3.0)
