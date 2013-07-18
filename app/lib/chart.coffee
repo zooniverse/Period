@@ -61,6 +61,7 @@ class Chart
         .attr('opacity', 1.0)
     
     @colorize = false
+    @stretch = false
     @colors = d3.scale.category20()
     
     if @parent
@@ -160,8 +161,13 @@ class Chart
     else
       @brushing = true
       @parent.xScale.domain @brush.extent()
+      
+      if @parent.stretch
+        yExtent = d3.extent @parent.dataInView(), (d) -> d.y
+        @parent.yScale.domain yExtent
     
     @parent.plot()
+    @parent.svg.select('.y.axis').call(d3.svg.axis().scale(@parent.yScale).orient('left')) if @parent.stretch
     @parent.svg.select('.x.axis').call d3.svg.axis().scale(@parent.xScale).orient('bottom')
   
   plot: =>
@@ -174,6 +180,8 @@ class Chart
       .attr('height', 2)
       .attr('x', @x)
       .attr('y', @y)
+    
+    chartRegion.exit().remove()
     
     dot = chartRegion.attr('class', 'dot')
       .attr('x', @x)
