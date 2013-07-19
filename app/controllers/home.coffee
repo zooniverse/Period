@@ -30,6 +30,10 @@ class Home
       @primaryChart.render()
       @zoomChart.render()
     
+    @amplitudeSlider = new VariableSlider name: 'amplitude', label: 'Amplitude Deviation', min: 1, max: 4, step: 0.1, callback: (value) =>
+      @primaryChart.amplitudeDeviations = value
+      @primaryChart.drawAmplitude()
+    
     # i = 0
     # for type, list of examples
     #   $('.examples').append $("<div class='example' name='#{ type }'><h2 class='type'>#{ type }</span></h2>")

@@ -12,6 +12,7 @@ class Chart
     
     @brushing = false
     @period = null
+    @amplitudeDeviations = null
     
     @svg = d3.select(@opts.container)
       .append('div')
@@ -48,17 +49,34 @@ class Chart
       .attr('class', 'x axis')
       .attr('transform', "translate(#{ 0 }, #{ @height })")
     
-    @svg.append('g')
-        .attr('class', 'chart-region')
-        .attr('width', @width)
-        .attr('height', @height)
-        .attr('clip-path', "url(#clip-#{ @opts.name })")
-      .append('path')
-        .attr('class', 'fit-line')
-        .attr('stroke-width', 3.0)
-        .attr('stroke', '#049cdb')
-        .attr('fill', 'transparent')
-        .attr('opacity', 1.0)
+    chartRegion = @svg.append('g')
+      .attr('class', 'chart-region')
+      .attr('width', @width)
+      .attr('height', @height)
+      .attr('clip-path', "url(#clip-#{ @opts.name })")
+    
+    chartRegion.append('path')
+      .attr('class', 'fit-line')
+      .attr('stroke-width', 3.0)
+      .attr('stroke', '#049cdb')
+      .attr('fill', 'transparent')
+      .attr('opacity', 1.0)
+    
+    amplitudeLines = chartRegion.append('g')
+      .attr('class', 'amplitude-lines')
+      .style('opacity', 0)
+    
+    amplitudeLines.append('rect')
+      .attr('class', 'bounds')
+      .attr('stroke-width', 1.0)
+      .attr('stroke', 'rgba(0, 0, 213, 1)')
+      .attr('fill', 'rgba(0, 0, 213, 0.1)')
+    
+    amplitudeLines.append('path')
+      .attr('class', 'average')
+      .attr('stroke-width', 2.0)
+      .attr('stroke', 'rgba(0, 0, 213, 0.5)')
+      .attr('fill', 'transparent')
     
     @colorize = false
     @stretch = false
@@ -72,7 +90,6 @@ class Chart
     else
       # @gpu = new Gpu()
       @loadData @opts.file
-  
   
   loadData: (file) =>
     @minX = null
@@ -131,6 +148,32 @@ class Chart
     fitLine = d3.svg.line().x(@x).y @y
     @svg.select('.fit-line').attr 'd', fitLine(@fitData)
   
+  drawAmplitude: =>
+    if @amplitudeDeviations
+      data = @dataInView()
+      avg = @totalAvg
+      stdDev = Math.sqrt (1.0 / (data.length - 1)) * data.reduce((total, current) ->
+        total + Math.pow(current.y - avg, 2)
+      , 0)
+      
+      lower = avg - @amplitudeDeviations * stdDev
+      upper = avg + @amplitudeDeviations * stdDev
+      
+      [xMin, xMax] = @xScale.domain()
+      averageLine = d3.svg.line().x(@x).y(@y) [{ x: xMin, y: avg }, { x: xMax, y: avg }]
+      @svg.select('.amplitude-lines .average')
+        .attr('d', averageLine)
+      
+      @svg.select('.amplitude-lines .bounds')
+        .attr('x', @x(x: xMin, y: 0))
+        .attr('y', @y(x: 0, y: upper))
+        .attr('width', @width - 1)
+        .attr('height', @y(x: 0, y: lower) - @y(x: 0, y: upper))
+      
+      @svg.select('.amplitude-lines').style 'opacity', 1
+    else
+      @svg.select('.amplitude-lines').style 'opacity', 0
+  
   smooth: =>
     if @smoothing
       @data = []
@@ -169,6 +212,7 @@ class Chart
     @parent.plot()
     @parent.svg.select('.y.axis').call(d3.svg.axis().scale(@parent.yScale).orient('left')) if @parent.stretch
     @parent.svg.select('.x.axis').call d3.svg.axis().scale(@parent.xScale).orient('bottom')
+    @parent.drawAmplitude() if @parent.amplitudeDeviations
   
   plot: =>
     chartRegion = @svg.select('.chart-region').selectAll('.dot')

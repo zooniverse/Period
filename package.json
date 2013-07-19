@@ -2,7 +2,7 @@
   "name": "period",
   "version": "0.0.1",
   "dependencies": {
-    "haw": "~0.0.7",
+    "haw": "~0.1.1",
     "jqueryify": "~1.9.1",
     "d3": "3.2.4"
   }
