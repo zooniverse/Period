@@ -151,7 +151,7 @@ class Chart
   drawAmplitude: =>
     if @amplitudeDeviations
       data = @dataInView()
-      avg = @totalAvg
+      avg = d3.mean data, (d) -> d.y
       stdDev = Math.sqrt (1.0 / (data.length - 1)) * data.reduce((total, current) ->
         total + Math.pow(current.y - avg, 2)
       , 0)
