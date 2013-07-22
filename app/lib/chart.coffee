@@ -12,7 +12,7 @@ class Chart
     
     @brushing = false
     @period = null
-    @amplitudeDeviations = null
+    @magnitude = null
     
     @svg = d3.select(@opts.container)
       .append('div')
@@ -79,7 +79,7 @@ class Chart
       .attr('fill', 'transparent')
     
     @colorize = false
-    @stretch = false
+    @stretch = true
     @colors = d3.scale.category20()
     
     if @parent
@@ -108,6 +108,7 @@ class Chart
       # @gpu.loadData(xArr, yArr)
       
       @totalAvg = d3.median @rawData, (d) -> d.y
+      
       @smooth()
       @render()
       @callback? @
@@ -149,26 +150,26 @@ class Chart
     @svg.select('.fit-line').attr 'd', fitLine(@fitData)
   
   drawAmplitude: =>
-    if @amplitudeDeviations
+    if @magnitude
       data = @dataInView()
-      avg = d3.mean data, (d) -> d.y
-      stdDev = Math.sqrt (1.0 / (data.length - 1)) * data.reduce((total, current) ->
-        total + Math.pow(current.y - avg, 2)
-      , 0)
+      median = d3.median data, (d) -> d.y
       
-      lower = avg - @amplitudeDeviations * stdDev
-      upper = avg + @amplitudeDeviations * stdDev
+      amplitude = (median * ((@magnitude / 1.08524) + 1)) - median
+      
+      lower = median - amplitude / 2
+      upper = median + amplitude / 2
       
       [xMin, xMax] = @xScale.domain()
-      averageLine = d3.svg.line().x(@x).y(@y) [{ x: xMin, y: avg }, { x: xMax, y: avg }]
+      xMin += 1e-10; xMax -= 1e-10
+      averageLine = d3.svg.line().x(@x).y(@y) [{ x: xMin, y: median }, { x: xMax, y: median }]
       @svg.select('.amplitude-lines .average')
         .attr('d', averageLine)
       
       @svg.select('.amplitude-lines .bounds')
-        .attr('x', @x(x: xMin, y: 0))
-        .attr('y', @y(x: 0, y: upper))
+        .attr('x', @x(x: xMin))
+        .attr('y', @y(y: upper))
         .attr('width', @width - 1)
-        .attr('height', @y(x: 0, y: lower) - @y(x: 0, y: upper))
+        .attr('height', @y(y: lower) - @y(y: upper))
       
       @svg.select('.amplitude-lines').style 'opacity', 1
     else
@@ -212,7 +213,7 @@ class Chart
     @parent.plot()
     @parent.svg.select('.y.axis').call(d3.svg.axis().scale(@parent.yScale).orient('left')) if @parent.stretch
     @parent.svg.select('.x.axis').call d3.svg.axis().scale(@parent.xScale).orient('bottom')
-    @parent.drawAmplitude() if @parent.amplitudeDeviations
+    @parent.drawAmplitude() if @parent.magnitude
   
   plot: =>
     chartRegion = @svg.select('.chart-region').selectAll('.dot')

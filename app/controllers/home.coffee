@@ -30,8 +30,8 @@ class Home
       @primaryChart.render()
       @zoomChart.render()
     
-    @amplitudeSlider = new VariableSlider name: 'amplitude', label: 'Amplitude Deviation', min: 1, max: 4, step: 0.1, callback: (value) =>
-      @primaryChart.amplitudeDeviations = value
+    @magnitudeSlider = new VariableSlider name: 'magnitude', label: 'Magnitude', min: 0.001, max: 4, step: 0.001, callback: (value) =>
+      @primaryChart.magnitude = value
       @primaryChart.drawAmplitude()
     
     # i = 0
